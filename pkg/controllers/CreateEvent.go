@@ -1,36 +1,62 @@
 package controllers
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"net/http"
 
+	"github.com/nu7hatch/gouuid"
 	"github.com/Nesh108/Dead-Simple-Game-Analytics/pkg/models"
 )
 
 func (c controller) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	body, err := ioutil.ReadAll(r.Body)
 
+	err := r.ParseForm()
 	if err != nil {
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode("{\"message\" :\"Failed to read body.\"}")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	projectName, ok := r.URL.Query()["project_name"]
+    if !ok || len(projectName[0]) < 1 {
+        c.ErrorResponse(w, "Url param project_name is required.")
+		return
+    }
+
+	userId := r.PostForm.Get("user_id")
+	if userId == "" {
+		c.ErrorResponse(w, "Post field user_id is required.")
+		return
+	}
+
+	eventKey := r.PostForm.Get("event_key")
+	if eventKey == "" {
+		c.ErrorResponse(w, "Post field event_key is required.")
+		return
+	}
+
+	eventValue := r.PostForm.Get("event_value")
+	if eventValue == "" {
+		c.ErrorResponse(w, "Post field event_value is required.")
+		return
+	}
+	
+	requestId, err := uuid.NewV4()
+	if err != nil {
+        c.ErrorResponse(w, "Failed to generate request_id.")
+		return
+    }
 
 	var event models.Event
-	if errUnmashaling := json.Unmarshal(body, &event); errUnmashaling != nil {
-		json.NewEncoder(w).Encode("{\"message\" :\"Failed to parse arguments.\"}")
+	event.ProjectName = projectName[0]
+	event.UserId = userId
+	event.EventKey = eventKey
+	event.EventValue = eventValue
+	event.RequestId = requestId.String()
+	
+	if result := c.DB.Create(&event); result.Error != nil {
+		c.ErrorResponse(w, "Failed to create event in DB.")
 		return
 	}
 
-	if result := c.DB.Create(&event); result.Error != nil {
-		fmt.Println(result.Error)
-	}
-
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode("Created")
+	c.SuccessResponse(w)
 }
