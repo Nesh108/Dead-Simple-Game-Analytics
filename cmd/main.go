@@ -26,6 +26,7 @@ func main() {
 
     router.HandleFunc("/events", c.GetEvents).Methods(http.MethodGet)
     router.HandleFunc("/events", c.CreateEvent).Methods(http.MethodPost)
+    router.HandleFunc("/export", c.ExportEvents).Methods(http.MethodGet)
 
     log.Println("API is running!")
     http.ListenAndServe(":4000", router)
