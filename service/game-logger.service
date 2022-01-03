@@ -1,0 +1,10 @@
+[Unit]
+Description=Game Logger service
+
+[Service]
+Restart=always
+RestartSec=3
+ExecStart=/root/GameLogger/Dead-Simple-Game-Analytics/start-server.sh
+
+[Install]
+WantedBy=multi-user.target
