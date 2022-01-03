@@ -4,6 +4,7 @@ import (
     "gorm.io/gorm"
     "encoding/json"
     "net/http"
+    "fmt"
 
 	"github.com/Nesh108/Dead-Simple-Game-Analytics/pkg/models"
 )
@@ -16,8 +17,15 @@ func New(db *gorm.DB) controller {
     return controller{db}
 }
 
-func (c controller) ErrorResponse(w http.ResponseWriter, message string) {
+// use http statuses for different errors: https://go.dev/src/net/http/status.go
+func (c controller) ValidationErrorResponse(w http.ResponseWriter, message string) {
     c.Response(w, message, http.StatusBadRequest)
+    return
+}
+
+func (c controller) UnhandledErrorResponse(w http.ResponseWriter, err error) {
+    fmt.Println(err)
+    c.Response(w, err.Error(), http.StatusInternalServerError)
     return
 }
 

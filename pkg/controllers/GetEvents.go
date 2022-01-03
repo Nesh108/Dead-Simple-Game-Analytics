@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/Nesh108/Dead-Simple-Game-Analytics/pkg/models"
@@ -11,8 +10,19 @@ import (
 func (c controller) GetEvents(w http.ResponseWriter, r *http.Request) {
 	var events []models.Event
 
-	if result := c.DB.Find(&events); result.Error != nil {
-		fmt.Println(result.Error)
+	projectParam, ok := r.URL.Query()["project_id"]
+    if !ok || len(projectParam[0]) < 1 {
+		if result := c.DB.Find(&events); result.Error != nil {
+			c.UnhandledErrorResponse(w, result.Error)
+			return
+		}
+    } else {
+		project := projectParam[0]
+		if result := c.DB.Where("project_name = ?", project).Find(&events); result.Error != nil {
+			c.UnhandledErrorResponse(w, result.Error)
+			return
+		}
+	
 	}
 
 	w.Header().Add("Content-Type", "application/json")
