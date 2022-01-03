@@ -5,6 +5,7 @@ import (
     "log"
 	"fmt"
 	"runtime"
+    "os"
 
     "github.com/gorilla/mux"
     "github.com/Nesh108/Dead-Simple-Game-Analytics/pkg/db"
@@ -29,5 +30,5 @@ func main() {
     router.HandleFunc("/export", c.ExportEvents).Methods(http.MethodGet)
 
     log.Println("API is running!")
-    http.ListenAndServe(":4000", router)
+    http.ListenAndServe(":" + os.Getenv("PORT"), router)
 }

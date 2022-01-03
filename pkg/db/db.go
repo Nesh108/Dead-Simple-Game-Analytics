@@ -2,6 +2,7 @@ package db
 
 import (
     "log"
+    "os"
 
     "github.com/Nesh108/Dead-Simple-Game-Analytics/pkg/models"
     "gorm.io/driver/postgres"
@@ -9,7 +10,12 @@ import (
 )
 
 func Init() *gorm.DB {
-    dbURL := "postgres://pg:pass@localhost:5432/game_logger" // TODO - make env variable
+    user := os.Getenv("PG_USER")
+    pw := os.Getenv("PG_PASSWORD")
+    host := os.Getenv("PG_HOST")
+    port := os.Getenv("PG_PORT")
+    dbName := os.Getenv("PG_DB")
+    dbURL := "postgres://" + user + ":" + pw + "@" + host + ":" + port + "/" + dbName
 
     db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
 
