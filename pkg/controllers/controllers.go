@@ -17,17 +17,20 @@ func New(db *gorm.DB) controller {
 }
 
 func (c controller) ErrorResponse(w http.ResponseWriter, message string) {
-	w.Header().Add("Content-Type", "application/json")
-    var response models.Response
-    response.Message = message
-    json.NewEncoder(w).Encode(response)
+    c.Response(w, message, http.StatusBadRequest)
     return
 }
 
 func (c controller) SuccessResponse(w http.ResponseWriter) {
+    c.Response(w, "success", http.StatusOK)
+    return
+}
+
+func (c controller) Response(w http.ResponseWriter, message string, statusCode int) {
 	w.Header().Add("Content-Type", "application/json")
+    w.WriteHeader(statusCode)
     var response models.Response
-    response.Message = "success"
+    response.Message = message
     json.NewEncoder(w).Encode(response)
     return
 }
