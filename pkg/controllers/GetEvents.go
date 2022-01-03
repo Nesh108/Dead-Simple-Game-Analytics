@@ -10,7 +10,7 @@ import (
 func (c controller) GetEvents(w http.ResponseWriter, r *http.Request) {
 	var events []models.Event
 
-	projectParam, ok := r.URL.Query()["project_id"]
+	projectParam, ok := r.URL.Query()["project"]
     if !ok || len(projectParam[0]) < 1 {
 		if result := c.DB.Find(&events); result.Error != nil {
 			c.UnhandledErrorResponse(w, result.Error)

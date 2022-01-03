@@ -16,9 +16,9 @@ func (c controller) CreateEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	projectParam, ok := r.URL.Query()["project_id"]
+	projectParam, ok := r.URL.Query()["project"]
     if !ok || len(projectParam[0]) < 1 {
-        c.ValidationErrorResponse(w, "Url param project_id is required.")
+        c.ValidationErrorResponse(w, "Url param project is required.")
 		return
     }
 	project := projectParam[0]
