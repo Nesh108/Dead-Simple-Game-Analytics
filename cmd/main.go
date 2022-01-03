@@ -30,5 +30,5 @@ func main() {
     router.HandleFunc("/export", c.ExportEvents).Methods(http.MethodGet)
 
     log.Println("API is running!")
-    http.ListenAndServe(":" + os.Getenv("PORT"), router)
+    fmt.Println(http.ListenAndServe(":" + os.Getenv("PORT"), router))
 }

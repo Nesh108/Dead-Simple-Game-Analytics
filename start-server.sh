@@ -1,2 +1,2 @@
 source .env
-go run cmd/main.go 4000
+go run cmd/main.go &
