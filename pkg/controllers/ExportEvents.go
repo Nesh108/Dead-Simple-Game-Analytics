@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"os/exec"
 
 	"github.com/Nesh108/Dead-Simple-Game-Analytics/pkg/models"
 )
@@ -54,6 +55,12 @@ func (c controller) ExportEvents(w http.ResponseWriter, r *http.Request) {
 			c.UnhandledErrorResponse(w, err)
 			return
 		}
+    }
+
+	_, err = exec.Command("scripts/exampleScript.sh").Output()
+    if err != nil {
+        c.UnhandledErrorResponse(w, err)
+		return
     }
 
 	c.SuccessResponse(w)
