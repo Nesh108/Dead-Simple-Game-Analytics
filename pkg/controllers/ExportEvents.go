@@ -6,7 +6,8 @@ import (
 	"os"
 	"strconv"
 	"os/exec"
-
+	"fmt"
+	
 	"github.com/Nesh108/Dead-Simple-Game-Analytics/pkg/models"
 )
 
@@ -15,34 +16,33 @@ func (c controller) ExportEvents(w http.ResponseWriter, r *http.Request) {
 
 	exportName := "complete"
 	projectParam, ok := r.URL.Query()["project"]
-    if !ok || len(projectParam[0]) < 1 {
+	if !ok || len(projectParam[0]) < 1 {
 		if result := c.DB.Find(&events); result.Error != nil {
 			c.UnhandledErrorResponse(w, result.Error)
 			return
 		}
-    } else {
+	} else {
 		project := projectParam[0]
 		exportName = project
 		if result := c.DB.Where("project_name = ?", project).Find(&events); result.Error != nil {
 			c.UnhandledErrorResponse(w, result.Error)
 			return
 		}
-	
+
 	}
 
 	filename := "exports/" + exportName + "_export.csv"
-    f, err := os.Create(filename)
-    defer f.Close()
+	f, err := os.Create(filename)
+	defer f.Close()
 
-    if err != nil {
+	if err != nil {
 		c.UnhandledErrorResponse(w, err)
 		return
-    }
+	}
 
-    writer := csv.NewWriter(f)
-	defer writer.Flush()
+	writer := csv.NewWriter(f)
 	writer.Write([]string{"id","user_id","project_name","event_key","event_value","request_id"})
-	
+
 	for _, value := range events {
 		err = writer.Write([]string{
 			strconv.Itoa(value.Id),
@@ -51,17 +51,22 @@ func (c controller) ExportEvents(w http.ResponseWriter, r *http.Request) {
 			value.EventKey,
 			value.EventValue,
 			value.RequestId})
-        if err != nil {
+		if err != nil {
+			writer.Flush()
 			c.UnhandledErrorResponse(w, err)
 			return
 		}
-    }
-
-	_, err = exec.Command("scripts/exampleScript.sh").Output()
-    if err != nil {
-        c.UnhandledErrorResponse(w, err)
+	}
+	writer.Flush()
+	
+	// Call external script (if needed)
+	output, err = exec.Command("scripts/exampleScript.sh").Output()
+	fmt.Printf("OUT: %s\n", output)
+	
+	if err != nil {
+		c.UnhandledErrorResponse(w, err)
 		return
-    }
+	}
 
 	c.SuccessResponse(w)
 	return
