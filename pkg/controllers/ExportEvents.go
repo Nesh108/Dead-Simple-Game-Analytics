@@ -40,7 +40,7 @@ func (c controller) ExportEvents(w http.ResponseWriter, r *http.Request) {
     }
 
     writer := csv.NewWriter(f)
-	writer.Write([]string{"id","user_id","project_name","event_key","event_value","request_id"})
+	writer.Write([]string{"id","user_id","project_name","event_key","event_value","request_id","timestamp"})
 
 	for _, value := range events {
 		err = writer.Write([]string{
@@ -49,7 +49,8 @@ func (c controller) ExportEvents(w http.ResponseWriter, r *http.Request) {
 			value.ProjectName,
 			value.EventKey,
 			value.EventValue,
-			value.RequestId})
+			value.RequestId,
+			value.Timestamp.Format("2006-01-02 15:04:05")})
         
 		if err != nil {
 			writer.Flush()
