@@ -3,8 +3,8 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/nu7hatch/gouuid"
 	"github.com/Nesh108/Dead-Simple-Game-Analytics/pkg/models"
+	uuid "github.com/nu7hatch/gouuid"
 )
 
 func (c controller) CreateEvent(w http.ResponseWriter, r *http.Request) {
@@ -17,10 +17,10 @@ func (c controller) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	projectParam, ok := r.URL.Query()["project"]
-    if !ok || len(projectParam[0]) < 1 {
-        c.ValidationErrorResponse(w, "Url param project is required.")
+	if !ok || len(projectParam[0]) < 1 {
+		c.ValidationErrorResponse(w, "Url param project is required.")
 		return
-    }
+	}
 	project := projectParam[0]
 
 	userId := r.PostForm.Get("user_id")
@@ -43,24 +43,24 @@ func (c controller) CreateEvent(w http.ResponseWriter, r *http.Request) {
 
 	eventNum := len(eventValues)
 	if eventNum != len(eventKeys) {
-        c.ValidationErrorResponse(w, "The number of event_value does not match the number of event_key.")
+		c.ValidationErrorResponse(w, "The number of event_value does not match the number of event_key.")
 		return
-    }
-	
+	}
+
 	requestId, err := uuid.NewV4()
 	if err != nil {
-        c.ValidationErrorResponse(w, "Failed to generate request_id.")
+		c.ValidationErrorResponse(w, "Failed to generate request_id.")
 		return
-    }
+	}
 
 	events := []models.Event{}
 	for i := 0; i < eventNum; i++ {
 		e := models.Event{
 			ProjectName: project,
-			UserId: userId,
-			EventKey: eventKeys[i],
-			EventValue: eventValues[i],
-			RequestId: requestId.String(),
+			UserId:      userId,
+			EventKey:    eventKeys[i],
+			EventValue:  eventValues[i],
+			RequestId:   requestId.String(),
 		}
 		events = append(events, e)
 	}
@@ -71,5 +71,4 @@ func (c controller) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c.SuccessResponse(w)
-	return
 }
