@@ -1,10 +1,24 @@
 [Unit]
 Description=Game Logger service
+Wants = network-online.target systemd-networkd-wait-online.service
+After = network.target
 
 [Service]
-Restart=always
-RestartSec=3
+Type=simple
+
+EnvironmentFile=/root/GameLogger/Dead-Simple-Game-Analytics/.env
+WorkingDirectory=/root/GameLogger/Dead-Simple-Game-Analytics
 ExecStart=/root/GameLogger/Dead-Simple-Game-Analytics/start-server.sh
+ExecReload=/bin/kill -USR1 $MAINPID
+ExecStop=/bin/kill -SIGTERM $MAINPID
+
+KillMode=control-group
+Restart=on-failure
+RestartSec=5s
+
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=game-logger
 
 [Install]
 WantedBy=multi-user.target
