@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/Nesh108/Dead-Simple-Game-Analytics/pkg/models"
+	"github.com/Nesh108/Dead-Simple-Game-Analytics/pkg/services"
 )
 
 type controller struct {
@@ -25,7 +26,8 @@ func (c controller) ValidationErrorResponse(w http.ResponseWriter, message strin
 
 func (c controller) UnhandledErrorResponse(w http.ResponseWriter, message string, err error) {
 	fmt.Println(err)
-	errorMessage := fmt.Sprintf("%s: %s", message, err.Error())
+	errorMessage := fmt.Sprintf("DeadSimpleGameAnalytics: %s (%s).", message, err.Error())
+	services.SendTelegramMessages(errorMessage)
 	c.Response(w, errorMessage, http.StatusInternalServerError)
 }
 
