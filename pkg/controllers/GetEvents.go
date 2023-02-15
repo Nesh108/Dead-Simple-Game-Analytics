@@ -2,12 +2,10 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/Nesh108/Dead-Simple-Game-Analytics/pkg/models"
-	"github.com/Nesh108/Dead-Simple-Game-Analytics/pkg/services"
 )
 
 func (c controller) GetEvents(w http.ResponseWriter, r *http.Request) {
@@ -46,8 +44,6 @@ func (c controller) GetEvents(w http.ResponseWriter, r *http.Request) {
 
 	encodeErr := json.NewEncoder(w).Encode(events)
 	if encodeErr != nil {
-		fmt.Println(encodeErr)
-		errorMessage := fmt.Sprintf("DeadSimpleGameAnalytics: %s (%s).", "Failed to AutoMigrate DB", encodeErr.Error())
-		services.SendTelegramMessages(errorMessage)
+		c.UnhandledErrorResponse(w, "Failed to encode Events Response", encodeErr)
 	}
 }

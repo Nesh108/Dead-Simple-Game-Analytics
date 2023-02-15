@@ -1,10 +1,12 @@
 package db
 
 import (
+	"fmt"
 	"log"
 	"os"
 
 	"github.com/Nesh108/Dead-Simple-Game-Analytics/pkg/models"
+	"github.com/Nesh108/Dead-Simple-Game-Analytics/pkg/services"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -25,8 +27,9 @@ func Init() *gorm.DB {
 
 	migrateErr := db.AutoMigrate(&models.Event{})
 	if migrateErr != nil {
-		c.UnhandledErrorResponse(w, "Failed to AutoMigrate DB", migrateErr)
-		return
+		fmt.Println(migrateErr)
+		errorMessage := fmt.Sprintf("DeadSimpleGameAnalytics: %s (%s).", "Failed to AutoMigrate DB", migrateErr.Error())
+		services.SendTelegramMessages(errorMessage)
 	}
 
 	return db
