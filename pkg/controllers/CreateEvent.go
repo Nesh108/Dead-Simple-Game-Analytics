@@ -66,7 +66,7 @@ func (c controller) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if result := c.DB.Create(&events); result.Error != nil {
-		c.UnhandledErrorResponse(w, result.Error)
+		c.UnhandledErrorResponse(w, "Failed to create event", result.Error)
 		return
 	}
 

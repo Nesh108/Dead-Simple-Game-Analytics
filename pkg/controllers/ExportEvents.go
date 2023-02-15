@@ -18,14 +18,14 @@ func (c controller) ExportEvents(w http.ResponseWriter, r *http.Request) {
 	projectParam, ok := r.URL.Query()["project"]
 	if !ok || len(projectParam[0]) < 1 {
 		if result := c.DB.Order("id asc").Find(&events); result.Error != nil {
-			c.UnhandledErrorResponse(w, result.Error)
+			c.UnhandledErrorResponse(w, "Failed to fetch projects", result.Error)
 			return
 		}
 	} else {
 		project := projectParam[0]
 		exportName = project
 		if result := c.DB.Where("project_name = ?", project).Order("id asc").Find(&events); result.Error != nil {
-			c.UnhandledErrorResponse(w, result.Error)
+			c.UnhandledErrorResponse(w, "Failed to fetch projects for " + project, result.Error)
 			return
 		}
 	}
@@ -34,7 +34,7 @@ func (c controller) ExportEvents(w http.ResponseWriter, r *http.Request) {
 	f, err := os.Create(filename)
 
 	if err != nil {
-		c.UnhandledErrorResponse(w, err)
+		c.UnhandledErrorResponse(w, "Failed to create file for export", err)
 		return
 	}
 
@@ -55,7 +55,7 @@ func (c controller) ExportEvents(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			writer.Flush()
-			c.UnhandledErrorResponse(w, err)
+			c.UnhandledErrorResponse(w, "Failed to write file for export", err)
 			return
 		}
 	}
@@ -63,7 +63,7 @@ func (c controller) ExportEvents(w http.ResponseWriter, r *http.Request) {
 	output, errOutput := exec.Command(os.Getenv("EXPORT_COMMAND_PATH")).Output()
 	fmt.Printf("OUT: %s\n", output)
 	if errOutput != nil {
-		c.UnhandledErrorResponse(w, err)
+		c.UnhandledErrorResponse(w, "Failed to execute command for export", err)
 		return
 	}
 

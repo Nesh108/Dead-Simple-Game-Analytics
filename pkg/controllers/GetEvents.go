@@ -21,7 +21,7 @@ func (c controller) GetEvents(w http.ResponseWriter, r *http.Request) {
 	if ok && len(sinceParam[0]) > 0 {
 		since, err := time.Parse("02-01-2006", sinceParam[0]) // expected date format is DD-MM-YYYY
 		if err != nil {
-			c.UnhandledErrorResponse(w, err)
+			c.ValidationErrorResponse(w,  "Param since must be formatted DD-MM-YYYY: " + err.Error())
 			return
 		}
 		query = query.Where("timestamp >= ?", since)
@@ -34,7 +34,7 @@ func (c controller) GetEvents(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if result := query.Order("id asc").Find(&events); result.Error != nil {
-		c.UnhandledErrorResponse(w, result.Error)
+		c.UnhandledErrorResponse(w, "Failed to fetch events", result.Error)
 		return
 	}
 

@@ -23,9 +23,10 @@ func (c controller) ValidationErrorResponse(w http.ResponseWriter, message strin
 	c.Response(w, message, http.StatusBadRequest)
 }
 
-func (c controller) UnhandledErrorResponse(w http.ResponseWriter, err error) {
+func (c controller) UnhandledErrorResponse(w http.ResponseWriter, message string, err error) {
 	fmt.Println(err)
-	c.Response(w, err.Error(), http.StatusInternalServerError)
+	errorMessage := fmt.Sprintf("%s: %s", message, err.Error())
+	c.Response(w, errorMessage, http.StatusInternalServerError)
 }
 
 func (c controller) SuccessResponse(w http.ResponseWriter) {
