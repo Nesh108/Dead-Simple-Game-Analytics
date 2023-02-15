@@ -5,15 +5,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
-	"log"
 	"strings"
 )
 
 var (
-	Token  string
-	ChatId string
+	Token   string
+	ChatIds []string
 )
 
 func getUrl(endpoint string) string {
@@ -21,12 +21,12 @@ func getUrl(endpoint string) string {
 }
 
 func SendTelegramMessages(text string) (bool, error) {
-	chatIdsStr := os.Getenv("TELEGRAM_CHAT_IDS")
-	chatIds := strings.Split(chatIdsStr, ";")
+	if ChatIds == nil {
+		ChatIds = strings.Split(os.Getenv("TELEGRAM_CHAT_IDS"), ";")
+	}
 
-	for i := 0; i < len(chatIds); i++ {
-		log.Println("chat id " + chatIds[i])
-		SendTelegramMessage(text, chatIds[i])
+	for i := 0; i < len(ChatIds); i++ {
+		SendTelegramMessage(text, ChatIds[i])
 	}
 
 	return true, nil

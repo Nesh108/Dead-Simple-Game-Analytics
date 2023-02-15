@@ -40,5 +40,8 @@ func (c controller) Response(w http.ResponseWriter, message string, statusCode i
 	w.WriteHeader(statusCode)
 	var response models.Response
 	response.Message = message
-	json.NewEncoder(w).Encode(response)
+	encodeErr := json.NewEncoder(w).Encode(response)
+	if encodeErr != nil {
+		c.UnhandledErrorResponse(w, "Failed to encode Controller Response", encodeErr)
+	}
 }

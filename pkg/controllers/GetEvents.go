@@ -2,9 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
+
 	"github.com/Nesh108/Dead-Simple-Game-Analytics/pkg/models"
+	"github.com/Nesh108/Dead-Simple-Game-Analytics/pkg/services"
 )
 
 func (c controller) GetEvents(w http.ResponseWriter, r *http.Request) {
@@ -21,7 +24,7 @@ func (c controller) GetEvents(w http.ResponseWriter, r *http.Request) {
 	if ok && len(sinceParam[0]) > 0 {
 		since, err := time.Parse("02-01-2006", sinceParam[0]) // expected date format is DD-MM-YYYY
 		if err != nil {
-			c.ValidationErrorResponse(w,  "Param since must be formatted DD-MM-YYYY: " + err.Error())
+			c.ValidationErrorResponse(w, "Param since must be formatted DD-MM-YYYY: "+err.Error())
 			return
 		}
 		query = query.Where("timestamp >= ?", since)
@@ -40,5 +43,11 @@ func (c controller) GetEvents(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(events)
+
+	encodeErr := json.NewEncoder(w).Encode(events)
+	if encodeErr != nil {
+		fmt.Println(encodeErr)
+		errorMessage := fmt.Sprintf("DeadSimpleGameAnalytics: %s (%s).", "Failed to AutoMigrate DB", encodeErr.Error())
+		services.SendTelegramMessages(errorMessage)
+	}
 }
