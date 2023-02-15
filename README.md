@@ -10,3 +10,7 @@ Own your data and export it to CSV for your own analysis.
 A fancy website with sleek graphics, funnels and complex behaviours. There are many amazing [systems](https://github.com/0xnr/awesome-analytics) out there already.
 
 
+## Running locally
+```
+./scripts/start-local.sh
+```
