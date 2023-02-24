@@ -65,10 +65,15 @@ func (c controller) CreateEvent(w http.ResponseWriter, r *http.Request) {
 		events = append(events, e)
 	}
 
-	if result := c.DB.Create(&events); result.Error != nil {
+	tx := c.DB.Begin()
+	if result := tx.Create(&events); result.Error != nil {
+		// Rollback the transaction if there's an error
+		tx.Rollback()
 		c.UnhandledErrorResponse(w, "Failed to create event", result.Error)
 		return
 	}
+	// Commit the transaction if everything is successful
+	tx.Commit()
 
 	c.SuccessResponse(w)
 }
