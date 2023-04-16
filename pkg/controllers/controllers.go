@@ -2,8 +2,10 @@ package controllers
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
+	"syscall"
 
 	"gorm.io/gorm"
 
@@ -41,7 +43,8 @@ func (c controller) Response(w http.ResponseWriter, message string, statusCode i
 	var response models.Response
 	response.Message = message
 	encodeErr := json.NewEncoder(w).Encode(response)
-	if encodeErr != nil {
+
+	if encodeErr != nil && !errors.Is(encodeErr, syscall.EPIPE) {
 		c.UnhandledErrorResponse(w, "Failed to encode Controller Response", encodeErr)
 	}
 }
