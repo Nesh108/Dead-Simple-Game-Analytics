@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"syscall"
 
 	"gorm.io/gorm"
@@ -28,7 +29,12 @@ func (c controller) ValidationErrorResponse(w http.ResponseWriter, message strin
 
 func (c controller) UnhandledErrorResponse(w http.ResponseWriter, message string, err error) {
 	fmt.Println(err)
-	errorMessage := fmt.Sprintf("DeadSimpleGameAnalytics: %s (%s).", message, err.Error())
+	hostname, err := os.Hostname()
+	if err != nil {
+		hostname = "N/A"
+	}
+
+	errorMessage := fmt.Sprintf("[%s] DeadSimpleGameAnalytics: %s (%s).", hostname, message, err.Error())
 	services.SendTelegramMessages(errorMessage)
 	c.Response(w, errorMessage, http.StatusInternalServerError)
 }

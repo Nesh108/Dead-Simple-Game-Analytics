@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/Nesh108/Dead-Simple-Game-Analytics/pkg/models"
@@ -12,7 +13,7 @@ func (c controller) CreateEvent(w http.ResponseWriter, r *http.Request) {
 
 	err := r.ParseForm()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		c.UnhandledErrorResponse(w, "Error parsing form", err)
 		return
 	}
 
@@ -69,7 +70,14 @@ func (c controller) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	if result := tx.Create(&events); result.Error != nil {
 		// Rollback the transaction if there's an error
 		tx.Rollback()
-		c.UnhandledErrorResponse(w, "Failed to create event", result.Error)
+		// Convert the array of custom structs to JSON
+		jsonData, err := json.Marshal(events)
+		jsonString := ""
+		if err == nil {
+			jsonString = string(jsonData)
+		}
+
+		c.UnhandledErrorResponse(w, "Failed to create event: "+jsonString, result.Error)
 		return
 	}
 	// Commit the transaction if everything is successful
