@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/Nesh108/Dead-Simple-Game-Analytics/pkg/models"
@@ -32,6 +33,14 @@ func (c controller) GetEvents(w http.ResponseWriter, r *http.Request) {
 	if ok && len(lastIdParam[0]) > 0 {
 		lastId := lastIdParam[0]
 		query = query.Where("id > ?", lastId)
+	}
+
+	limitParam, ok := r.URL.Query()["limit"]
+	if ok && len(limitParam[0]) > 0 {
+		limit, err := strconv.Atoi(limitParam[0])
+		if err == nil {
+			query = query.Limit(limit)
+		}
 	}
 
 	if result := query.Order("id asc").Find(&events); result.Error != nil {
